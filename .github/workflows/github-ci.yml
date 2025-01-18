@@ -1,0 +1,71 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  install-poetry:
+    name: Install Poetry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Poetry
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl
+          curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.0.1 python3 -
+          echo 'export PATH="$HOME/.local/bin:$PATH"' >> $GITHUB_ENV
+          echo "POETRY_HOME=$HOME/.poetry" >> $GITHUB_ENV
+          echo "PATH=$POETRY_HOME/bin:$PATH" >> $GITHUB_ENV
+          source $GITHUB_ENV
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config installer.parallel true
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Save Poetry and Virtual Environment
+        uses: actions/upload-artifact@v4
+        with:
+          name: poetry-environment
+          path: |
+            .venv
+            $HOME/.poetry
+
+  check-format:
+    name: Check Code Format
+    runs-on: ubuntu-latest
+
+    needs: install-poetry
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Load Poetry Environment
+        uses: actions/download-artifact@v4
+        with:
+          name: poetry-environment
+
+      - name: Check Code Format
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          make check_format
