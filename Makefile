@@ -3,7 +3,7 @@ PYTHON_FILES := $(shell find solarxdatahub -name '*.py')
 ENV := poetry
 PYTHON := $(ENV) run python3
 
-.PHONY: install_env install_dev_env clean lint format check_format run build publish
+.PHONY: install_env install_dev_env clean lint format check_format run
 
 # Installing environment
 install_env:
@@ -14,13 +14,13 @@ install_dev_env:
 
 # Code
 lint:
-	$(PYTHON) -m pylint $(PYTHON_FILES)
+	$(ENV) run python3 -m pylint $(PYTHON_FILES)
 
 format:
-	$(ENV) run ruff check --fix $(PYTHON_FILES)
+	$(ENV) run poetry run ruff check --fix $(PYTHON_FILES)
 
 check_format:
-	$(ENV) run ruff check $(PYTHON_FILES)
+	$(ENV) run poetry run ruff check $(PYTHON_FILES)
 
 run:
 	$(PYTHON) -m solarxdatahub
