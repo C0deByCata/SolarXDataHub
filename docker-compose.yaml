@@ -1,0 +1,17 @@
+# Docker compose to run a test database
+
+services:
+  mysql_db:
+    image:  mysql:8.0.32 # production version
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=docker # User: root
+      - MYSQL_DATABASE=solaxcloud # Database name
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_db:/var/lib/mysql
+
+volumes:
+  mysql_db:
+    driver: local

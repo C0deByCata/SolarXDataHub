@@ -1,0 +1,135 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  install-dependencies:
+    name: Install Dependencies
+    runs-on: ubuntu-22.04
+    outputs:
+      cache-key: ${{ steps.cache-dependencies.outputs.cache-hit }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.0.1
+
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Verify Poetry Installation
+        run: poetry --version
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry config installer.parallel true
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with=dev --no-interaction --no-root
+  check-format:
+    name: Check Code Format
+    runs-on: ubuntu-22.04
+    needs: install-dependencies
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      # 1) Instalar Poetry
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.0.1
+
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # 2) Restaurar la caché
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      # 3) Instalar dependencias (incluyendo las de dev)
+      #    Esto asegura que, si la caché no coincide, Poetry instale
+      #    y que el virtualenv tenga 'ruff' disponible.
+      - name: Install dependencies
+        run: poetry install --with=dev --no-interaction --no-root
+
+      # (Opcional) Verificar que Poetry y ruff estén instalados
+      - name: Verify Poetry Installation
+        run: poetry --version
+
+      - name: Verify Installed Packages
+        run: poetry run pip list
+
+      - name: Run Code Format Check
+        run: poetry run ruff check solarxdatahub
+  release:
+    name: Release
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install semantic-release and plugins
+        run: |
+          npm install -g semantic-release \
+            @semantic-release/github \
+            conventional-changelog-conventionalcommits \
+            @semantic-release/commit-analyzer \
+            semantic-release-replace-plugin \
+            @semantic-release/release-notes-generator \
+            @semantic-release/git
+
+      - name: Run semantic-release
+        # semantic-release usará '.releaserc.yml' por defecto si está en la raíz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release

@@ -1,0 +1,23 @@
+[project]
+name = "solarxdatahub"
+version = "1.0.0"
+description = ""
+authors = [
+    {name = "C0deByCata",email = "rotarucatalinr@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas (>=2.2.3,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.2"
+mypy = "^1.14.1"
+
