@@ -1,0 +1,72 @@
+{
+  "branches": ["master", "develop"],
+  "preset": "conventionalcommits",
+  "plugins":
+    [
+      "@semantic-release/github",
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules":
+            [
+              { "type": "refactor", "release": "patch" },
+              { "type": "perf", "release": "patch" },
+              { "type": "docs", "release": "patch" },
+              { "type": "style", "release": "patch" },
+              { "type": "ci", "release": "patch" },
+              { "type": "build", "release": "patch" },
+              { "type": "chore", "release": "patch" },
+              { "type": "test", "release": "patch" },
+            ],
+        },
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "parserOpts":
+            {
+              "noteKeywords":
+                ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"],
+            },
+          "presetConfig":
+            {
+              "types":
+                [
+                  { "type": "feat", "section": "Features" },
+                  { "type": "fix", "section": "Bug Fixes" },
+                  { "type": "refactor", "section": "Refactoring" },
+                  { "type": "perf", "section": "Performance Improvements" },
+
+                  { "type": "docs", "hidden": true },
+                  { "type": "style", "hidden": true },
+                  { "type": "ci", "hidden": true },
+                  { "type": "build", "hidden": true },
+                  { "type": "chore", "hidden": true },
+                  { "type": "test", "hidden": true },
+                ],
+            },
+        },
+      ],
+      [
+        "semantic-release-replace-plugin",
+        {
+          "replacements":
+            [
+              {
+                "files": ["pyproject.toml"],
+                "from": '^version = ".*"',
+                "to": 'version = "${nextRelease.version}"',
+                "countMatches": false,
+              },
+            ],
+        },
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": ["pyproject.toml"],
+          "message": "chore(release): version ${nextRelease.version} [skip ci]",
+        },
+      ],
+    ],
+}
