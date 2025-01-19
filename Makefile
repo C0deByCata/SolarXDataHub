@@ -24,3 +24,28 @@ check_format:
 
 run:
 	$(PYTHON) -m solarxdatahub
+
+#Docker
+#Create docker image
+docker_build:
+	docker build -t solarxdatahub .
+
+#up the service
+docker_up:
+	docker-compose up -d
+
+#down the service
+docker_down:
+	docker-compose down
+
+# view logs
+docker_logs:
+	docker-compose logs -f
+
+# run docker image removing it after
+docker_run_rm:
+	docker run --rm solarxdatahub
+
+# run docker image
+docker_run:
+	docker run --name solarxdatahub_app solarxdatahub
