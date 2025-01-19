@@ -9,6 +9,9 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: write
+
 jobs:
   install-dependencies:
     name: Install Dependencies
@@ -101,3 +104,33 @@ jobs:
 
       - name: Run Code Format Check
         run: poetry run ruff check solarxdatahub
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    # Opcionalmente, si solo quieres ejecutar el Release en 'master':
+    # if: ${{ github.ref == 'refs/heads/master' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install semantic-release and plugins
+        run: |
+          npm install -g semantic-release \
+            @semantic-release/github \
+            conventional-changelog-conventionalcommits \
+            @semantic-release/commit-analyzer \
+            semantic-release-replace-plugin \
+            @semantic-release/release-notes-generator \
+            @semantic-release/git
+
+      - name: Run semantic-release
+        # semantic-release usará '.releaserc.yml' por defecto si está en la raíz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release
