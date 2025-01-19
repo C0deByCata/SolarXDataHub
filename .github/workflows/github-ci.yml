@@ -106,9 +106,8 @@ jobs:
         run: poetry run ruff check solarxdatahub
   release:
     name: Release
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-22.04
-    # Opcionalmente, si solo quieres ejecutar el Release en 'master':
-    # if: ${{ github.ref == 'refs/heads/master' }}
 
     steps:
       - name: Check out repository
