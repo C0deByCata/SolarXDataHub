@@ -22,10 +22,10 @@ from solarxdatahub.database.writting import (
     insert_openweather_requests_log,
     insert_tb_battery_data,
     insert_tb_energy_data,
+    insert_tb_notification_log,
     insert_tb_phase_power_data,
     insert_weatherbit_current,
     insert_weatherbit_requests_log,
-    upsert_tb_notification_log,
 )
 
 
@@ -182,7 +182,7 @@ def insert_notification_log(df: pd.DataFrame):
     """
     return DataBaseConnection.write(
         host_name=Database.TARGET_HOST.name,
-        query=upsert_tb_notification_log,
+        query=insert_tb_notification_log,
         data=df,
         commit=True,
     )

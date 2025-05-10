@@ -4,22 +4,22 @@
 def read_master_tb_device_status_mapping() -> str:
     """Read the master_tb_device_status_mapping table."""
     return """SELECT code, status, description
-            FROM master_tb_device_status_mapping;"""
+            FROM solaxcloud.master_tb_device_status_mapping;"""
 
 
 def read_master_tb_inverters(inverter_sn: str = None) -> str:
     """Read the master_tb_inverters table."""
     if inverter_sn:
-        return f"""SELECT id FROM master_tb_inverters WHERE inverterSN = '{inverter_sn}';"""
+        return f"""SELECT id FROM solaxcloud.master_tb_inverters WHERE inverterSN = '{inverter_sn}';"""
     else:
         return """SELECT id, inverterSN, sn, inverterType, site_name, description
-                FROM master_tb_inverters;"""
+                FROM solaxcloud.master_tb_inverters;"""
 
 
 def read_master_tb_error_codes() -> str:
     """Read the master_tb_error_codes table."""
     return """SELECT code, message
-            FROM master_tb_error_codes;"""
+            FROM solaxcloud.master_tb_error_codes;"""
 
 
 def read_weatherbit_hourly_data() -> str:
