@@ -25,6 +25,8 @@ check_format:
 run:
 	$(PYTHON) -m solarxdatahub
 
+clean:
+	rm -rf .mypy_cache .ruff_cache
 #Docker
 #Create docker image
 docker_build:
