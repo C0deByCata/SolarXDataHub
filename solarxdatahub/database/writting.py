@@ -225,7 +225,7 @@ def insert_openweather_air_pollution() -> str:
     """
 
 
-def upsert_tb_notification_log() -> str:
+def insert_tb_notification_log() -> str:
     """
     Inserta o actualiza el timestamp de una notificación por inversor y tipo.
     """
