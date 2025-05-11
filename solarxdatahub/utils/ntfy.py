@@ -103,6 +103,7 @@ class NtfyNotification:
                 f"Tienes {surplus_power:.0f} W de excedente (umbral {self.excess_margin:.0f} W). "
                 "Puedes encender aparatos para aprovechar tu propia energía."
             )
+            logger.info(message)
         elif surplus_power < -self.excess_margin:
             notif_type = "high_consumption"
             title = "Consumo elevado"
@@ -110,6 +111,7 @@ class NtfyNotification:
                 f"Estás consumiendo {abs(surplus_power):.0f} W por encima de tu producción "
                 f"(umbral {self.excess_margin:.0f} W). Apaga aparatos para ahorrar."
             )
+            logger.info(message)
         else:
             return  # Ni excedente ni consumo suficientemente grande
 
