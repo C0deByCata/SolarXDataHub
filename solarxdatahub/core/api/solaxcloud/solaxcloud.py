@@ -100,7 +100,6 @@ class SolaxCloudAPI:
         self.ntfy.check_energy(
             inverter_id,
             feedinpower=result.feedinpower or 0,
-            acpower=result.acpower or 0,
         )
 
     def process_tb_energy_data(
