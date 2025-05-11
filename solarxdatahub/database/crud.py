@@ -164,14 +164,16 @@ def insert_openweather_air_pollution_(df_openweather_air_pollution: pd.DataFrame
     )
 
 
-def get_last_notification_timestamp(inverter_id: int, notif_type: str) -> pd.DataFrame:
+def get_last_notification_timestamp(
+    inverter_id: int, notification_type: str
+) -> pd.DataFrame:
     """
     Devuelve el timestamp de la última notificación enviada para un inversor y tipo.
     """
     return DataBaseConnection.read(
         host_name=Database.TARGET_HOST.name,
         query=read_last_notification_timestamp,
-        params={"inverter_id": inverter_id, "notification_type": notif_type},
+        params={"inverter_id": inverter_id, "notification_type": notification_type},
         as_df=True,
     )
 
