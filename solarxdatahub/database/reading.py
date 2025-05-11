@@ -57,8 +57,16 @@ def read_last_notification_timestamp(
     """
     Devuelve el timestamp de la última notificación enviada para un inversor y tipo.
     """
-    var = f"""SELECT sent_at FROM solaxcloud.tb_notification_log
-            WHERE inverter_id = {inverter_id} AND notification_type = '{notification_type}';"""
+    if notification_type is None:
+        where_clause = ""
+    else:
+        where_clause = f"AND notification_type = '{notification_type}'"
+    var = f"""  SELECT notification_type, sent_at
+        FROM solaxcloud.tb_notification_log
+        WHERE inverter_id = {inverter_id}
+            {where_clause}
+        ORDER BY sent_at DESC
+        LIMIT 1;"""
     return var
 
 

@@ -1,6 +1,6 @@
 """Methods for controlling the data hub."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from loguru import logger
@@ -97,9 +97,19 @@ def process_weather_data(client: WeatherbitAPI) -> None:
         )
         return
 
+    interval_minutes = 60
     weatherbit_last_request = get_weatherbit_last_request()
     if not ensure_hour_interval_or_skip(weatherbit_last_request):
-        logger.warning("Skipping Weatherbit API request due to interval constraints.")
+        # Recalcular cuánto tiempo queda
+        last_time = pd.to_datetime(weatherbit_last_request.iloc[0]["last_request"])
+        elapsed = datetime.now() - last_time
+        remaining = timedelta(minutes=interval_minutes) - elapsed
+        # Log con tiempo restante
+        mins, secs = divmod(int(remaining.total_seconds()), 60)
+        logger.warning(
+            f"Saltando petición a Weatherbit: "
+            f"faltan {mins} min {secs} s para la siguiente petición."
+        )
         return
 
     current_request_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -143,9 +153,19 @@ def process_openweather_data(client: OpenWeatherAPI) -> None:
         )
         return
 
+    interval_minutes = 60
     openweather_last_request = get_openweather_last_request()
     if not ensure_hour_interval_or_skip(openweather_last_request):
-        logger.warning("Skipping OpenWeather API request due to interval constraints.")
+        # Recalcular cuánto tiempo queda
+        last_time = pd.to_datetime(openweather_last_request.iloc[0]["last_request"])
+        elapsed = datetime.now() - last_time
+        remaining = timedelta(minutes=interval_minutes) - elapsed
+        # Log con tiempo restante
+        mins, secs = divmod(int(remaining.total_seconds()), 60)
+        logger.warning(
+            f"Saltando petición a OpenWeather: "
+            f"faltan {mins} min {secs} s para la siguiente petición."
+        )
         return
 
     current_weather = client.get_current_weather(request_options)
